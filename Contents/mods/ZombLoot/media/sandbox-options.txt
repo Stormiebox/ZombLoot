@@ -1,0 +1,145 @@
+VERSION = 1,
+
+option ZombTime.startTime
+{
+	type = integer, min = 0, max = 23, default = 0,
+	page = ZombTime, translation = ZombTime_startTime,
+}
+
+option ZombTime.endTime
+{
+	type = integer, min = 0, max = 23, default = 5,
+	page = ZombTime, translation = ZombTime_endTime,
+}
+
+option ZombTime.dropChance
+{
+	type = double, min = 0.01, max = 100.00, default = 2.00,
+	page = ZombTime, translation = ZombTime_dropChance,
+}
+
+option ZombTime.itemTable
+{
+	type = string, default = Base.Axe/Base.HandAxe/Base.PickAxe/Base.BaseballBat/Base.Crowbar/Base.GardenHoe/Base.Shovel/Base.HuntingKnife/Base.Nightstick/Base.LeadPipe/Base.Katana/Base.Machete,
+	page = ZombTime, translation = ZombTime_itemTable,
+}
+
+option ZombTime.startText
+{
+	type = string, default = Fever Time!,
+	page = ZombTime, translation = ZombTime_startText,
+}
+
+option ZombTime.endText
+{
+	type = string, default = Fever End!,
+	page = ZombTime, translation = ZombTime_endText,
+}
+
+option ZombTime.dropText
+{
+	type = string, default = Drop,
+	page = ZombTime, translation = ZombTime_dropText,
+}
+
+option ZombTime.textShow
+{
+	type = boolean, default = true,
+	page = ZombTime, translation = ZombTime_textShow,
+}
+
+option ZombTime.dropLocation
+{
+	type = enum, numValues = 2, default = 1,
+	page = ZombTime, translation = ZombTime_dropLocation,
+}
+
+option ZombLoot.dropChance
+{
+	type = double, min = 0.01, max = 100.00, default = 2.00,
+	page = ZombLoot, translation = ZombLoot_dropChance,
+}
+
+option ZombLoot.itemTable
+{
+	type = string, default = Base.Axe/Base.HandAxe/Base.PickAxe/Base.BaseballBat/Base.Crowbar/Base.GardenHoe/Base.Shovel/Base.HuntingKnife/Base.Nightstick/Base.LeadPipe/Base.Katana/Base.Machete,
+	page = ZombLoot, translation = ZombLoot_itemTable,
+}
+
+option ZombLoot.dropTextShow
+{
+	type = boolean, default = false,
+	page = ZombLoot, translation = ZombLoot_dropTextShow,
+}
+
+option ZombLoot.dropLocation
+{
+	type = enum, numValues = 2, default = 1,
+	page = ZombLoot, translation = ZombLoot_dropLocation,
+}
+
+option ZombWeather.dropChance
+{
+	type = double, min = 0.01, max = 100.00, default = 5.00,
+	page = ZombWeather, translation = ZombWeather_dropChance,
+}
+
+option ZombWeather.itemTable
+{
+	type = string, default = Base.Axe/Base.HandAxe/Base.PickAxe/Base.BaseballBat/Base.Crowbar,
+	page = ZombWeather, translation = ZombWeather_itemTable,
+}
+
+option ZombWeather.dropText
+{
+	type = string, default = Storm Loot!,
+	page = ZombWeather, translation = ZombWeather_dropText,
+}
+
+option ZombWeather.textShow
+{
+	type = boolean, default = true,
+	page = ZombWeather, translation = ZombWeather_textShow,
+}
+
+option ZombWeather.dropLocation
+{
+	type = enum, numValues = 2, default = 1,
+	page = ZombWeather, translation = ZombWeather_dropLocation,
+}
+
+option ZombCombo.comboTarget
+{
+	type = integer, min = 2, max = 500, default = 10,
+	page = ZombCombo, translation = ZombCombo_comboTarget,
+}
+
+option ZombCombo.timeWindow
+{
+	type = integer, min = 1, max = 600, default = 10,
+	page = ZombCombo, translation = ZombCombo_timeWindow,
+}
+
+option ZombCombo.itemTable
+{
+	type = string, default = Base.Axe/Base.HandAxe/Base.PickAxe/Base.BaseballBat/Base.Crowbar,
+	page = ZombCombo, translation = ZombCombo_itemTable,
+}
+
+option ZombCombo.dropText
+{
+	type = string, default = Combo Bonus!,
+	page = ZombCombo, translation = ZombCombo_dropText,
+}
+
+option ZombCombo.textShow
+{
+	type = boolean, default = true,
+	page = ZombCombo, translation = ZombCombo_textShow,
+}
+
+option ZombCombo.dropLocation
+{
+	type = enum, numValues = 2, default = 1,
+	page = ZombCombo, translation = ZombCombo_dropLocation,
+}
