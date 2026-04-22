@@ -41,10 +41,9 @@ local function ZombWeather_death(_zombie)
 
 	local rain = climate:getPrecipitationIntensity() or 0
 	local fog = climate:getFogIntensity() or 0
-	local snow = climate:getSnowIntensity() or 0
 
-	-- If it's noticeably raining, snowing, or foggy
-	if rain > 0.3 or fog > 0.3 or snow > 0.3 then
+	-- If it's noticeably precipitating (rain/snow) or foggy
+	if rain > 0.3 or fog > 0.3 then
 		local ran = ZombRand(0, 10000)
 		if (ran < ZW.dropChance) then
 			local ran2 = ZombRand(1, #ZW.itemTable + 1)
@@ -56,6 +55,8 @@ local function ZombWeather_death(_zombie)
 			else
 				if killer and instanceof(killer, "IsoPlayer") then
 					killer:getInventory():AddItem(itemToDrop)
+				else
+					_zombie:getInventory():AddItem(itemToDrop) -- Fallback to corpse
 				end
 			end
 

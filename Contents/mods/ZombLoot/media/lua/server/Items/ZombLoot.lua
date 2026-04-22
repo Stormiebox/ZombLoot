@@ -56,6 +56,8 @@ local function ZombLoot_death(_zombie)
 			else
 				if killer and instanceof(killer, "IsoPlayer") then
 					killer:getInventory():AddItem(itemToDrop)
+				else
+					_zombie:getInventory():AddItem(itemToDrop) -- Fallback to corpse
 				end
 			end
 
