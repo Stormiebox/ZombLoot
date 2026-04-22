@@ -9,6 +9,7 @@
 require 'Items/SuburbsDistributions'
 
 local ZT = {
+	enabled = true,
 	state = 0,
 	startTime = 0,
 	endTime = 5,
@@ -42,8 +43,12 @@ end
 -- Helper function to split a string into a table using a delimiter (e.g. "/")
 local function Split(s, delimiter)
 	local result = {}
+	if not s or s == "" then return result end
 	for match in (s .. delimiter):gmatch("(.-)" .. delimiter) do
-		table.insert(result, match)
+		local item = match:match("^%s*(.-)%s*$")
+		if item and item ~= "" then
+			table.insert(result, item)
+		end
 	end
 	return result
 end
@@ -81,10 +86,12 @@ local function checkZedTime()
 	local hour = currentTime:getTimeOfDay()
 	local isZedTime = false
 
-	if ZT.startTime < ZT.endTime then
-		isZedTime = (hour >= ZT.startTime and hour < ZT.endTime)
-	else
-		isZedTime = (hour >= ZT.startTime or hour < ZT.endTime)
+	if ZT.enabled then
+		if ZT.startTime < ZT.endTime then
+			isZedTime = (hour >= ZT.startTime and hour < ZT.endTime)
+		else
+			isZedTime = (hour >= ZT.startTime or hour < ZT.endTime)
+		end
 	end
 
 	if isZedTime then
@@ -106,6 +113,9 @@ end
 local function changeDrop()
 	if not getSandboxOptions() then return end
 
+	if getSandboxOptions():getOptionByName("ZombTime.Enable") then
+		ZT.enabled = getSandboxOptions():getOptionByName("ZombTime.Enable"):getValue()
+	end
 	ZT.startTime = getSandboxOptions():getOptionByName("ZombTime.startTime"):getValue()
 	ZT.endTime = getSandboxOptions():getOptionByName("ZombTime.endTime"):getValue()
 	ZT.dropChance = getSandboxOptions():getOptionByName("ZombTime.dropChance"):getValue() * 100

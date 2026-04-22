@@ -1,5 +1,11 @@
 VERSION = 1,
 
+option ZombTime.Enable
+{
+	type = boolean, default = true,
+	page = ZombTime, translation = ZombTime_Enable,
+}
+
 option ZombTime.startTime
 {
 	type = integer, min = 0, max = 23, default = 0,
@@ -54,6 +60,12 @@ option ZombTime.dropLocation
 	page = ZombTime, translation = ZombTime_dropLocation,
 }
 
+option ZombLoot.Enable
+{
+	type = boolean, default = true,
+	page = ZombLoot, translation = ZombLoot_Enable,
+}
+
 option ZombLoot.dropChance
 {
 	type = double, min = 0.01, max = 100.00, default = 2.00,
@@ -76,6 +88,12 @@ option ZombLoot.dropLocation
 {
 	type = enum, numValues = 2, default = 1,
 	page = ZombLoot, translation = ZombLoot_dropLocation,
+}
+
+option ZombWeather.Enable
+{
+	type = boolean, default = true,
+	page = ZombWeather, translation = ZombWeather_Enable,
 }
 
 option ZombWeather.dropChance
@@ -106,6 +124,12 @@ option ZombWeather.dropLocation
 {
 	type = enum, numValues = 2, default = 1,
 	page = ZombWeather, translation = ZombWeather_dropLocation,
+}
+
+option ZombCombo.Enable
+{
+	type = boolean, default = true,
+	page = ZombCombo, translation = ZombCombo_Enable,
 }
 
 option ZombCombo.comboTarget

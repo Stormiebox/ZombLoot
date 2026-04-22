@@ -9,6 +9,7 @@
 require 'Items/SuburbsDistributions'
 
 local ZC = {
+	enabled = true,
 	comboTarget = 10,
 	timeWindow = 10, -- in seconds
 	tmp = "",
@@ -23,14 +24,19 @@ local playerCombos = {}
 -- Helper function to split a string into a table using a delimiter (e.g. "/")
 local function Split(s, delimiter)
 	local result = {}
+	if not s or s == "" then return result end
 	for match in (s .. delimiter):gmatch("(.-)" .. delimiter) do
-		table.insert(result, match)
+		local item = match:match("^%s*(.-)%s*$")
+		if item and item ~= "" then
+			table.insert(result, item)
+		end
 	end
 	return result
 end
 
 -- Event handler triggered whenever a zombie dies, tracks player kill times for combos
 local function ZombCombo_death(_zombie)
+	if not ZC.enabled then return end
 	if (#ZC.itemTable == 0) then return end
 
 	local killer = _zombie:getAttackedBy()
@@ -75,6 +81,9 @@ end
 -- Reloads the current sandbox settings for combos into local memory
 local function ZC_LootChange()
 	if not getSandboxOptions() then return end
+	if getSandboxOptions():getOptionByName("ZombCombo.Enable") then
+		ZC.enabled = getSandboxOptions():getOptionByName("ZombCombo.Enable"):getValue()
+	end
 	ZC.comboTarget = getSandboxOptions():getOptionByName("ZombCombo.comboTarget"):getValue()
 	ZC.timeWindow = getSandboxOptions():getOptionByName("ZombCombo.timeWindow"):getValue()
 	ZC.dropLocation = getSandboxOptions():getOptionByName("ZombCombo.dropLocation"):getValue()

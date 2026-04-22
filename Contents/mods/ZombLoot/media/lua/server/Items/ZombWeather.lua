@@ -9,6 +9,7 @@
 require 'Items/SuburbsDistributions'
 
 local ZW = {
+	enabled = true,
 	dropChance = 500,
 	tmp = "",
 	itemTable = {},
@@ -20,14 +21,19 @@ local ZW = {
 -- Helper function to split a string into a table using a delimiter (e.g. "/")
 local function Split(s, delimiter)
 	local result = {}
+	if not s or s == "" then return result end
 	for match in (s .. delimiter):gmatch("(.-)" .. delimiter) do
-		table.insert(result, match)
+		local item = match:match("^%s*(.-)%s*$")
+		if item and item ~= "" then
+			table.insert(result, item)
+		end
 	end
 	return result
 end
 
 -- Event handler triggered whenever a zombie dies, checks current climate
 local function ZombWeather_death(_zombie)
+	if not ZW.enabled then return end
 	if (#ZW.itemTable == 0) then return end
 
 	local climate = getClimateManager()
@@ -65,6 +71,9 @@ end
 -- Reloads the current sandbox settings for weather events into local memory
 local function ZW_LootChange()
 	if not getSandboxOptions() then return end
+	if getSandboxOptions():getOptionByName("ZombWeather.Enable") then
+		ZW.enabled = getSandboxOptions():getOptionByName("ZombWeather.Enable"):getValue()
+	end
 	ZW.dropChance = getSandboxOptions():getOptionByName("ZombWeather.dropChance"):getValue() * 100
 	ZW.dropLocation = getSandboxOptions():getOptionByName("ZombWeather.dropLocation"):getValue()
 	ZW.tmp = getSandboxOptions():getOptionByName("ZombWeather.itemTable"):getValue()
