@@ -29,42 +29,60 @@ local function ZL_Split(s, delimiter)
 end
 
 -- Reloads the current sandbox settings into local memory (called on start and every 10 min)
-local function ZL_LootChange()
-	if not getSandboxOptions() then return end
-	if getSandboxOptions():getOptionByName("ZombLoot.Enable") then
-		ZL_enabled = getSandboxOptions():getOptionByName("ZombLoot.Enable"):getValue()
+local function getSandboxOptionValue(options, optionName, defaultValue)
+	if not options then
+		return defaultValue
 	end
-	ZL_dropChance = getSandboxOptions():getOptionByName("ZombLoot.dropChance"):getValue() * 100
-	ZL_dropLocation = getSandboxOptions():getOptionByName("ZombLoot.dropLocation"):getValue()
-	ZL_tmp = getSandboxOptions():getOptionByName("ZombLoot.itemTable"):getValue()
-	ZL_dropTextShow = getSandboxOptions():getOptionByName("ZombLoot.dropTextShow"):getValue()
+
+	local option = options:getOptionByName(optionName)
+	if option then
+		return option:getValue()
+	end
+
+	return defaultValue
+end
+
+local function ZL_LootChange()
+	local options = getSandboxOptions and getSandboxOptions() or nil
+	if not options then return end
+
+	ZL_enabled = getSandboxOptionValue(options, "ZombLoot.Enable", ZL_enabled)
+	ZL_dropChance = (tonumber(getSandboxOptionValue(options, "ZombLoot.dropChance", 0)) or 0) * 100
+	ZL_dropLocation = tonumber(getSandboxOptionValue(options, "ZombLoot.dropLocation", 1)) or 1
+	ZL_tmp = tostring(getSandboxOptionValue(options, "ZombLoot.itemTable", "") or "")
+	ZL_dropTextShow = getSandboxOptionValue(options, "ZombLoot.dropTextShow", false) == true
 	ZL_itemTable = ZL_Split(ZL_tmp, "/")
 end
 
 -- Event handler triggered whenever a zombie is killed
 local function ZombLoot_death(_zombie)
-	if not ZL_enabled then return end
+	if not ZL_enabled or not _zombie then return end
 	if (#ZL_itemTable > 0) then
 		local ran = ZombRand(0, 10000)
 		if (ran < ZL_dropChance) then
 			local ran2 = ZombRand(1, #ZL_itemTable + 1)
 			local itemToDrop = ZL_itemTable[ran2]
+			if not itemToDrop or itemToDrop == "" then
+				return
+			end
+
 			local killer = _zombie:getAttackedBy()
+			local zombieInventory = _zombie.getInventory and _zombie:getInventory() or nil
 
 			if (ZL_dropLocation == 1) then
-				_zombie:getInventory():AddItem(itemToDrop)
+				if zombieInventory then
+					zombieInventory:AddItem(itemToDrop)
+				end
 			else
 				if killer and instanceof(killer, "IsoPlayer") then
 					killer:getInventory():AddItem(itemToDrop)
-				else
-					_zombie:getInventory():AddItem(itemToDrop) -- Fallback to corpse
+				elseif zombieInventory then
+					zombieInventory:AddItem(itemToDrop) -- Fallback to corpse
 				end
 			end
 
-			if (ZL_dropTextShow == true) then
-				if killer and instanceof(killer, "IsoPlayer") then
-					killer:setHaloNote("!")
-				end
+			if ZL_dropTextShow and killer and instanceof(killer, "IsoPlayer") then
+				killer:setHaloNote("!")
 			end
 		end
 	end

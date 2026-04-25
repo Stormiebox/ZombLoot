@@ -55,20 +55,28 @@ end
 
 -- Event handler triggered whenever a zombie dies (only active during Fever Time)
 local function ZombTime_death(_zombie)
+	if not _zombie then return end
 	if (#ZT.itemTable > 0) then
 		local ran = ZombRand(0, 10000)
 		if (ran < ZT.dropChance) then
 			local ran2 = ZombRand(1, #ZT.itemTable + 1)
 			local itemToDrop = ZT.itemTable[ran2]
+			if not itemToDrop or itemToDrop == "" then
+				return
+			end
+
 			local killer = _zombie:getAttackedBy()
+			local zombieInventory = _zombie.getInventory and _zombie:getInventory() or nil
 
 			if (ZT.dropLocation == 1) then
-				_zombie:getInventory():AddItem(itemToDrop)
+				if zombieInventory then
+					zombieInventory:AddItem(itemToDrop)
+				end
 			else
 				if killer and instanceof(killer, "IsoPlayer") then
 					killer:getInventory():AddItem(itemToDrop)
-				else
-					_zombie:getInventory():AddItem(itemToDrop) -- Fallback to corpse
+				elseif zombieInventory then
+					zombieInventory:AddItem(itemToDrop) -- Fallback to corpse
 				end
 			end
 
@@ -112,24 +120,36 @@ local function checkZedTime()
 end
 
 -- Reloads the current sandbox settings for time events into local memory
-local function changeDrop()
-	if not getSandboxOptions() then return end
-
-	if getSandboxOptions():getOptionByName("ZombTime.Enable") then
-		ZT.enabled = getSandboxOptions():getOptionByName("ZombTime.Enable"):getValue()
+local function getSandboxOptionValue(options, optionName, defaultValue)
+	if not options then
+		return defaultValue
 	end
-	ZT.startTime = getSandboxOptions():getOptionByName("ZombTime.startTime"):getValue()
-	ZT.endTime = getSandboxOptions():getOptionByName("ZombTime.endTime"):getValue()
-	ZT.dropChance = getSandboxOptions():getOptionByName("ZombTime.dropChance"):getValue() * 100
-	ZT.textShow = getSandboxOptions():getOptionByName("ZombTime.textShow"):getValue()
-	ZT.dropLocation = getSandboxOptions():getOptionByName("ZombTime.dropLocation"):getValue()
-	ZT.tmp = getSandboxOptions():getOptionByName("ZombTime.itemTable"):getValue()
+
+	local option = options:getOptionByName(optionName)
+	if option then
+		return option:getValue()
+	end
+
+	return defaultValue
+end
+
+local function changeDrop()
+	local options = getSandboxOptions and getSandboxOptions() or nil
+	if not options then return end
+
+	ZT.enabled = getSandboxOptionValue(options, "ZombTime.Enable", ZT.enabled)
+	ZT.startTime = tonumber(getSandboxOptionValue(options, "ZombTime.startTime", ZT.startTime)) or ZT.startTime
+	ZT.endTime = tonumber(getSandboxOptionValue(options, "ZombTime.endTime", ZT.endTime)) or ZT.endTime
+	ZT.dropChance = (tonumber(getSandboxOptionValue(options, "ZombTime.dropChance", 0)) or 0) * 100
+	ZT.textShow = getSandboxOptionValue(options, "ZombTime.textShow", ZT.textShow) == true
+	ZT.dropLocation = tonumber(getSandboxOptionValue(options, "ZombTime.dropLocation", ZT.dropLocation)) or ZT.dropLocation
+	ZT.tmp = tostring(getSandboxOptionValue(options, "ZombTime.itemTable", "") or "")
 	ZT.itemTable = Split(ZT.tmp, "/")
 
-	if (ZT.textShow == true) then
-		ZT.startText = getSandboxOptions():getOptionByName("ZombTime.startText"):getValue()
-		ZT.endText = getSandboxOptions():getOptionByName("ZombTime.endText"):getValue()
-		ZT.dropText = getSandboxOptions():getOptionByName("ZombTime.dropText"):getValue()
+	if ZT.textShow then
+		ZT.startText = tostring(getSandboxOptionValue(options, "ZombTime.startText", "") or "")
+		ZT.endText = tostring(getSandboxOptionValue(options, "ZombTime.endText", "") or "")
+		ZT.dropText = tostring(getSandboxOptionValue(options, "ZombTime.dropText", "") or "")
 	else
 		ZT.startText = ""
 		ZT.endText = ""

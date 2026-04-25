@@ -36,7 +36,7 @@ end
 
 -- Event handler triggered whenever a zombie dies, tracks player kill times for combos
 local function ZombCombo_death(_zombie)
-	if not ZC.enabled then return end
+	if not ZC.enabled or not _zombie then return end
 	if (#ZC.itemTable == 0) then return end
 
 	local killer = _zombie:getAttackedBy()
@@ -65,9 +65,15 @@ local function ZombCombo_death(_zombie)
 
 		local ran = ZombRand(1, #ZC.itemTable + 1)
 		local itemToDrop = ZC.itemTable[ran]
+		if not itemToDrop or itemToDrop == "" then
+			return
+		end
 
+		local zombieInventory = _zombie.getInventory and _zombie:getInventory() or nil
 		if (ZC.dropLocation == 1) then
-			_zombie:getInventory():AddItem(itemToDrop)
+			if zombieInventory then
+				zombieInventory:AddItem(itemToDrop)
+			end
 		else
 			killer:getInventory():AddItem(itemToDrop)
 		end
@@ -79,17 +85,30 @@ local function ZombCombo_death(_zombie)
 end
 
 -- Reloads the current sandbox settings for combos into local memory
-local function ZC_LootChange()
-	if not getSandboxOptions() then return end
-	if getSandboxOptions():getOptionByName("ZombCombo.Enable") then
-		ZC.enabled = getSandboxOptions():getOptionByName("ZombCombo.Enable"):getValue()
+local function getSandboxOptionValue(options, optionName, defaultValue)
+	if not options then
+		return defaultValue
 	end
-	ZC.comboTarget = getSandboxOptions():getOptionByName("ZombCombo.comboTarget"):getValue()
-	ZC.timeWindow = getSandboxOptions():getOptionByName("ZombCombo.timeWindow"):getValue()
-	ZC.dropLocation = getSandboxOptions():getOptionByName("ZombCombo.dropLocation"):getValue()
-	ZC.tmp = getSandboxOptions():getOptionByName("ZombCombo.itemTable"):getValue()
-	ZC.textShow = getSandboxOptions():getOptionByName("ZombCombo.textShow"):getValue()
-	ZC.dropText = getSandboxOptions():getOptionByName("ZombCombo.dropText"):getValue()
+
+	local option = options:getOptionByName(optionName)
+	if option then
+		return option:getValue()
+	end
+
+	return defaultValue
+end
+
+local function ZC_LootChange()
+	local options = getSandboxOptions and getSandboxOptions() or nil
+	if not options then return end
+
+	ZC.enabled = getSandboxOptionValue(options, "ZombCombo.Enable", ZC.enabled)
+	ZC.comboTarget = tonumber(getSandboxOptionValue(options, "ZombCombo.comboTarget", ZC.comboTarget)) or ZC.comboTarget
+	ZC.timeWindow = tonumber(getSandboxOptionValue(options, "ZombCombo.timeWindow", ZC.timeWindow)) or ZC.timeWindow
+	ZC.dropLocation = tonumber(getSandboxOptionValue(options, "ZombCombo.dropLocation", ZC.dropLocation)) or ZC.dropLocation
+	ZC.tmp = tostring(getSandboxOptionValue(options, "ZombCombo.itemTable", "") or "")
+	ZC.textShow = getSandboxOptionValue(options, "ZombCombo.textShow", ZC.textShow) == true
+	ZC.dropText = tostring(getSandboxOptionValue(options, "ZombCombo.dropText", ZC.dropText) or "")
 	ZC.itemTable = Split(ZC.tmp, "/")
 end
 
